@@ -8,7 +8,7 @@ import java.util.Random;
  *
  * @author: onlylemi
  */
-public class GeneticMath {
+public class GeneticAlgorithm {
 
     private static final float DEFAULT_CROSSOVER_PROBABILITY = 0.9f; // 默认交叉概率
     private static final float DEFAULT_MUTATION_PROBABILITY = 0.01f; // 默认突变概率
@@ -31,11 +31,19 @@ public class GeneticMath {
     private int currentBestPosition; // 当前最好个体的位置
     private float currentBestDist; // 当前最好个体的距离
 
-    private float[] values;
+    private float[] values; // 种群中每个个体的dist
     private float[] fitnessValues; // 适应度集
     private float[] roulette;
 
     private boolean isAutoNextGeneration = false;
+
+    public static GeneticAlgorithm getInstance() {
+        return GeneticAlgorithmHolder.instance;
+    }
+
+    private static class GeneticAlgorithmHolder {
+        private static GeneticAlgorithm instance = new GeneticAlgorithm();
+    }
 
     public int[] tsp(Point[] points) {
         this.points = points;
@@ -86,7 +94,7 @@ public class GeneticMath {
         crossover();
         // 变异
         mutation();
-        // 评价
+        // 评价最好
         evaluateBestIndivial();
 
         return bestIndivial;
@@ -99,10 +107,10 @@ public class GeneticMath {
         int[][] parents = new int[populationSize][points.length];
 
         int initnum = 4;
-        parents[0] = population[currentBestPosition];
-        parents[1] = doMutate(bestIndivial.clone());
-        parents[2] = pushMutate(bestIndivial.clone());
-        parents[3] = bestIndivial.clone();
+        parents[0] = population[currentBestPosition]; // 当前种群中最好的个体
+        parents[1] = exchangeMutate(bestIndivial.clone()); // 对最好的个体进行交换变异
+        parents[2] = insertMutate(bestIndivial.clone()); // 对最好的个体进行插入变异
+        parents[3] = bestIndivial.clone(); // 所有代中最好的个体
 
         setRoulette();
         for (int i = initnum; i < populationSize; i++) {
@@ -114,10 +122,10 @@ public class GeneticMath {
     /**
      *
      */
-    public void setRoulette() {
+    private void setRoulette() {
         //calculate all the fitness
         for (int i = 0; i < values.length; i++) {
-            fitnessValues[i] = 1.0f / values[i];
+            fitnessValues[i] = 1.0f / values[i]; // 适应度为路径长的导数
         }
 
         //set the roulette
@@ -153,7 +161,7 @@ public class GeneticMath {
      * @param seq
      * @return
      */
-    private int[] doMutate(int[] seq) {
+    private int[] exchangeMutate(int[] seq) {
         mutationTimes++;
         int m, n;
         do {
@@ -171,10 +179,12 @@ public class GeneticMath {
     }
 
     /**
+     * 插入变异
+     *
      * @param seq
      * @return
      */
-    private int[] pushMutate(int[] seq) {
+    private int[] insertMutate(int[] seq) {
         mutationTimes++;
         int m, n;
         do {
@@ -184,9 +194,14 @@ public class GeneticMath {
 
         int[] s1 = Arrays.copyOfRange(seq, 0, m);
         int[] s2 = Arrays.copyOfRange(seq, m, n);
-        int[] s3 = Arrays.copyOfRange(seq, n, seq.length);
 
-        return concatAllArray(s1, s2, s3);
+        for (int i = 0; i < m; i++) {
+            seq[i + n - m] = s1[i];
+        }
+        for (int i = 0; i < n - m; i++) {
+            seq[i] = s2[i];
+        }
+        return seq;
     }
 
     /**
@@ -201,8 +216,9 @@ public class GeneticMath {
                 num++;
             }
         }
+        queue = Arrays.copyOfRange(queue, 0, num);
         queue = shuffle(queue);
-        for (int i = 0; i < num - 1; i++) {
+        for (int i = 0; i < num - 1; i += 2) {
             doCrossover(queue[i], queue[i + 1]);
         }
     }
@@ -210,15 +226,17 @@ public class GeneticMath {
     private static final int PREVIOUS = 0;
     private static final int NEXT = 1;
 
-    /**
-     * @param x
-     * @param y
-     */
     private void doCrossover(int x, int y) {
         population[x] = getChild(x, y, PREVIOUS);
         population[y] = getChild(x, y, NEXT);
     }
 
+    /**
+     * @param x
+     * @param y
+     * @param pos
+     * @return
+     */
     private int[] getChild(int x, int y, int pos) {
         int[] solution = new int[points.length];
         int[] px = population[x].clone();
@@ -228,8 +246,7 @@ public class GeneticMath {
         int c = px[random(px.length)];
         solution[0] = c;
 
-        int i = 1;
-        while (px.length > 1) {
+        for (int i = 1; i < points.length; i++) {
             int posX = indexOf(px, c);
             int posY = indexOf(py, c);
 
@@ -240,12 +257,19 @@ public class GeneticMath {
                 dx = px[(posX + px.length + 1) % px.length];
                 dy = py[(posY + py.length + 1) % py.length];
             }
-            px = concatAllArray(Arrays.copyOfRange(px, 0, posX), Arrays.copyOfRange(px, posX + 1, px.length));
-            py = concatAllArray(Arrays.copyOfRange(py, 0, posY), Arrays.copyOfRange(py, posY + 1, py.length));
+
+            for (int j = posX; j < px.length - 1; j++) {
+                px[j] = px[j + 1];
+            }
+            px = Arrays.copyOfRange(px, 0, px.length - 1);
+            for (int j = posY; j < py.length - 1; j++) {
+                py[j] = py[j + 1];
+            }
+            py = Arrays.copyOfRange(py, 0, py.length - 1);
+
             c = dist[c][dx] < dist[c][dy] ? dx : dy;
 
             solution[i] = c;
-            i++;
         }
         return solution;
     }
@@ -257,9 +281,9 @@ public class GeneticMath {
         for (int i = 0; i < populationSize; i++) {
             if (Math.random() < mutationProbability) {
                 if (Math.random() > 0.5) {
-                    population[i] = pushMutate(population[i]);
+                    population[i] = insertMutate(population[i]);
                 } else {
-                    population[i] = doMutate(population[i]);
+                    population[i] = exchangeMutate(population[i]);
                 }
                 i--;
             }

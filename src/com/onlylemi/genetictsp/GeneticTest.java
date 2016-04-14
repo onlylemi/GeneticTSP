@@ -1,5 +1,6 @@
 package com.onlylemi.genetictsp;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -17,36 +18,36 @@ public class GeneticTest {
             points[i].y = new Random().nextInt(200);
         }
 
-        GeneticMath gm = new GeneticMath();
         int[] best;
 
         //=======================method 1=======================
+        //GeneticAlgorithm ga = new GeneticAlgorithm();
+        //best = ga.tsp(points);
 
-        best = gm.tsp(points);
-
-        int n = 0;
+        /*int n = 0;
         while (n++ < 100) {
-            best = gm.nextGeneration();
+            best = ga.nextGeneration();
 
-            System.out.println("best distance:" + gm.getBestDist() +
-                    " current generation:" + gm.getCurrentGeneration() +
-                    " mutation times:" + gm.getMutationTimes());
+            System.out.println("best distance:" + ga.getBestDist() +
+                    " current generation:" + ga.getCurrentGeneration() +
+                    " mutation times:" + ga.getMutationTimes());
             System.out.print("best path:");
             for (int i = 0; i < best.length; i++) {
                 System.out.print(best[i] + " ");
             }
             System.out.println();
-        }
+        }*/
 
         //=======================method 2========================
+        GeneticAlgorithm ga = GeneticAlgorithm.getInstance();
 
-//        gm.setMaxGeneration(100);
-//        gm.setAutoNextGeneration(true);
-//        best = gm.tsp(points);
-//        System.out.print("best path:");
-//        for (int i = 0; i < best.length; i++) {
-//            System.out.print(best[i] + " ");
-//        }
-//        System.out.println();
+        ga.setMaxGeneration(1000);
+        ga.setAutoNextGeneration(true);
+        best = ga.tsp(points);
+        System.out.print("best path:");
+        for (int i = 0; i < best.length; i++) {
+            System.out.print(best[i] + " ");
+        }
+        System.out.println();
     }
 }

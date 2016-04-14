@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class GeneticP5Visual extends PApplet {
 
-    private GeneticMath gm;
+    private GeneticAlgorithm ga;
     private Point[] points;
     private int[] best;
     private ControlP5 cp5;
@@ -32,7 +32,7 @@ public class GeneticP5Visual extends PApplet {
         lists = new ArrayList<>();
         addPoint(50);
 
-        gm = new GeneticMath();
+        ga = GeneticAlgorithm.getInstance();
 
         cp5 = new ControlP5(this);
         cp5.addButton("onAdd").setPosition(5, 100);
@@ -48,7 +48,7 @@ public class GeneticP5Visual extends PApplet {
 
         if (best != null) {
             if (running) {
-                best = gm.nextGeneration();
+                best = ga.nextGeneration();
             }
 
             stroke(255, 0, 0);
@@ -70,9 +70,9 @@ public class GeneticP5Visual extends PApplet {
         fill(0);
         textSize(12);
         text("point length: " + lists.size(), 5, 20);
-        text("current generation: " + gm.getCurrentGeneration(), 5, 35);
-        text("mutation times: " + gm.getMutationTimes(), 5, 50);
-        text("best distance: " + gm.getBestDist(), 5, 65);
+        text("current generation: " + ga.getCurrentGeneration(), 5, 35);
+        text("mutation times: " + ga.getMutationTimes(), 5, 50);
+        text("best distance: " + ga.getBestDist(), 5, 65);
     }
 
     public void onStart() {
@@ -86,7 +86,7 @@ public class GeneticP5Visual extends PApplet {
             for (int i = 0; i < lists.size(); i++) {
                 points[i] = lists.get(i);
             }
-            best = gm.tsp(points);
+            best = ga.tsp(points);
         }
 
         running = true;
@@ -107,7 +107,7 @@ public class GeneticP5Visual extends PApplet {
 
     public void reStart() {
         if (points != null) {
-            best = gm.tsp(points);
+            best = ga.tsp(points);
             running = true;
         }
     }
