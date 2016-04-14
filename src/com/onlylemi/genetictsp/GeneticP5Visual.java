@@ -15,6 +15,7 @@ public class GeneticP5Visual extends PApplet {
 
     private GeneticAlgorithm ga;
     private Point[] points;
+
     private int[] best;
     private ControlP5 cp5;
 
@@ -86,7 +87,7 @@ public class GeneticP5Visual extends PApplet {
             for (int i = 0; i < lists.size(); i++) {
                 points[i] = lists.get(i);
             }
-            best = ga.tsp(points);
+            best = ga.tsp(getDist(points));
         }
 
         running = true;
@@ -107,7 +108,7 @@ public class GeneticP5Visual extends PApplet {
 
     public void reStart() {
         if (points != null) {
-            best = ga.tsp(points);
+            best = ga.tsp(getDist(points));
             running = true;
         }
     }
@@ -146,6 +147,20 @@ public class GeneticP5Visual extends PApplet {
         point.y = mouseY;
 
         lists.add(point);
+    }
+
+    private float[][] getDist(Point[] points) {
+        float[][] dist = new float[points.length][points.length];
+        for (int i = 0; i < points.length; i++) {
+            for (int j = 0; j < points.length; j++) {
+                dist[i][j] = distance(points[i], points[j]);
+            }
+        }
+        return dist;
+    }
+
+    private float distance(Point p1, Point p2) {
+        return (float) Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
     }
 
     public static void main(String[] args) {

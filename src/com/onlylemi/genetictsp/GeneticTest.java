@@ -1,6 +1,5 @@
 package com.onlylemi.genetictsp;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -22,7 +21,7 @@ public class GeneticTest {
 
         //=======================method 1=======================
         //GeneticAlgorithm ga = new GeneticAlgorithm();
-        //best = ga.tsp(points);
+        //best = ga.tsp(getDist(points));
 
         /*int n = 0;
         while (n++ < 100) {
@@ -43,11 +42,25 @@ public class GeneticTest {
 
         ga.setMaxGeneration(1000);
         ga.setAutoNextGeneration(true);
-        best = ga.tsp(points);
+        best = ga.tsp(getDist(points));
         System.out.print("best path:");
         for (int i = 0; i < best.length; i++) {
             System.out.print(best[i] + " ");
         }
         System.out.println();
+    }
+
+    private static float[][] getDist(Point[] points) {
+        float[][] dist = new float[points.length][points.length];
+        for (int i = 0; i < points.length; i++) {
+            for (int j = 0; j < points.length; j++) {
+                dist[i][j] = distance(points[i], points[j]);
+            }
+        }
+        return dist;
+    }
+
+    private static float distance(Point p1, Point p2) {
+        return (float) Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
     }
 }
