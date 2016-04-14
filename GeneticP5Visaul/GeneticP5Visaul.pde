@@ -10,8 +10,7 @@ import java.util.List;
  * @author: onlylemi
  */
 
- 
-GeneticMath gm;
+GeneticAlgorithm gm;
 Point[] points;
 int[] best;
 ControlP5 cp5;
@@ -20,17 +19,15 @@ boolean running = false;
 
 List<Point> lists;
 
-
 void settings() {
 	size(1000, 600);
 }
-
 
 void setup() {
 	lists = new ArrayList<Point>();
 	addPoint(50);
 
-	gm = new GeneticMath();
+	gm = new GeneticAlgorithm();
 
 	cp5 = new ControlP5(this);
 	cp5.addButton("onAdd").setPosition(5, 100);
