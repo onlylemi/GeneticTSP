@@ -20,7 +20,7 @@ public class GeneticAlgorithm {
     private int currentGeneration = 0; // 当前的一代
     private int maxGeneration = 1000; // 最大代数
 
-    private Point[] points; // 点集
+    private int pointNum;
     private int[][] population; // 种群集
     private float[][] dist; // 点集间的邻接矩阵
 
@@ -43,8 +43,15 @@ public class GeneticAlgorithm {
         private static GeneticAlgorithm instance = new GeneticAlgorithm();
     }
 
-    public int[] tsp(Point[] points) {
-        this.points = points;
+    /**
+     * 点集间的邻接矩阵
+     *
+     * @param matrix
+     * @return
+     */
+    public int[] tsp(float[][] matrix) {
+        this.dist = matrix;
+        pointNum = matrix.length;
         init();
 
         if (isAutoNextGeneration) {
@@ -53,6 +60,7 @@ public class GeneticAlgorithm {
                 nextGeneration();
             }
         }
+        isAutoNextGeneration = false;
         return bestIndivial;
     }
 
@@ -70,12 +78,12 @@ public class GeneticAlgorithm {
         values = new float[populationSize];
         fitnessValues = new float[populationSize];
         roulette = new float[populationSize];
-        population = new int[populationSize][points.length];
+        population = new int[populationSize][pointNum];
 
-        initDist(points);
+        //initDist(points);
         // 父代
         for (int i = 0; i < populationSize; i++) {
-            population[i] = randomIndivial(points.length);
+            population[i] = randomIndivial(pointNum);
         }
         evaluateBestIndivial();
     }
@@ -102,7 +110,7 @@ public class GeneticAlgorithm {
      * 选择
      */
     private void selection() {
-        int[][] parents = new int[populationSize][points.length];
+        int[][] parents = new int[populationSize][pointNum];
 
         int initnum = 4;
         parents[0] = population[currentBestPosition]; // 当前种群中最好的个体
@@ -140,6 +148,8 @@ public class GeneticAlgorithm {
     }
 
     /**
+     * 模拟转盘，进行子代选取
+     *
      * @param ran
      * @return
      */
@@ -230,13 +240,15 @@ public class GeneticAlgorithm {
     }
 
     /**
+     * 根据父代求子代
+     *
      * @param x
      * @param y
      * @param pos
      * @return
      */
     private int[] getChild(int x, int y, int pos) {
-        int[] solution = new int[points.length];
+        int[] solution = new int[pointNum];
         int[] px = population[x].clone();
         int[] py = population[y].clone();
 
@@ -244,7 +256,7 @@ public class GeneticAlgorithm {
         int c = px[random(px.length)];
         solution[0] = c;
 
-        for (int i = 1; i < points.length; i++) {
+        for (int i = 1; i < pointNum; i++) {
             int posX = indexOf(px, c);
             int posY = indexOf(py, c);
 
@@ -360,22 +372,6 @@ public class GeneticAlgorithm {
         return a;
     }
 
-    /**
-     * 构建邻接矩阵
-     */
-    private void initDist(Point[] points) {
-        dist = new float[points.length][points.length];
-        for (int i = 0; i < points.length; i++) {
-            for (int j = 0; j < points.length; j++) {
-                dist[i][j] = distance(points[i], points[j]);
-            }
-        }
-    }
-
-    private float distance(Point p1, Point p2) {
-        return (float) Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
-    }
-
     private static Random rd;
 
     private int random(int n) {
@@ -408,19 +404,6 @@ public class GeneticAlgorithm {
         }
         return 0;
     }
-
-    /*public class Point {
-        public float x;
-        public float y;
-
-        @Override
-        public String toString() {
-            return "Point{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
-    }*/
 
     public int[] getBestIndivial() {
         return bestIndivial;

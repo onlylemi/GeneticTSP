@@ -80,7 +80,7 @@ void onStart() {
 		for (int i = 0; i < lists.size(); i++) {
 			points[i] = lists.get(i);
 		}
-		best = gm.tsp(points);
+		best = gm.tsp(getDist(points));
 	}
 
 	running = true;
@@ -101,7 +101,7 @@ void onStop() {
 
 void reStart() {
 	if (points != null) {
-		best = gm.tsp(points);
+		best = gm.tsp(getDist(points));
 		running = true;
 	}
 }
@@ -140,4 +140,18 @@ void addMousePoint() {
 	point.y = mouseY;
 
 	lists.add(point);
+}
+
+float[][] getDist(Point[] points) {
+	float[][] dist = new float[points.length][points.length];
+	for (int i = 0; i < points.length; i++) {
+		for (int j = 0; j < points.length; j++) {
+			dist[i][j] = distance(points[i], points[j]);
+		}
+	}
+	return dist;
+}
+
+float distance(Point p1, Point p2) {
+	return (float) Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
