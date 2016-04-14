@@ -19,6 +19,9 @@ public class GeneticTest {
 
         GeneticMath gm = new GeneticMath();
         int[] best;
+
+        //=======================method 1=======================
+
         best = gm.tsp(points);
 
         int n = 0;
@@ -28,10 +31,22 @@ public class GeneticTest {
             System.out.println("best distance:" + gm.getBestDist() +
                     " current generation:" + gm.getCurrentGeneration() +
                     " mutation times:" + gm.getMutationTimes());
+            System.out.print("best path:");
             for (int i = 0; i < best.length; i++) {
                 System.out.print(best[i] + " ");
             }
             System.out.println();
         }
+
+        //=======================method 2========================
+
+//        gm.setMaxGeneration(100);
+//        gm.setAutoNextGeneration(true);
+//        best = gm.tsp(points);
+//        System.out.print("best path:");
+//        for (int i = 0; i < best.length; i++) {
+//            System.out.print(best[i] + " ");
+//        }
+//        System.out.println();
     }
 }
