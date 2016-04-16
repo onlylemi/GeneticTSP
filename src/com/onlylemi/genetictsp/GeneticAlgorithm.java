@@ -63,7 +63,7 @@ public class GeneticAlgorithm {
             }
         }
         isAutoNextGeneration = false;
-        return bestIndivial;
+        return getBestIndivial();
     }
 
     /**
@@ -105,7 +105,7 @@ public class GeneticAlgorithm {
         // 评价最好
         evaluateBestIndivial();
 
-        return bestIndivial;
+        return getBestIndivial();
     }
 
     /**
@@ -408,7 +408,14 @@ public class GeneticAlgorithm {
     }
 
     public int[] getBestIndivial() {
-        return bestIndivial;
+        int[] best = new int[bestIndivial.length];
+        int pos = indexOf(bestIndivial, 0);
+
+        for (int i = 0; i < best.length; i++) {
+            best[i] = bestIndivial[(i + pos) % bestIndivial.length];
+        }
+        return best;
+//        return bestIndivial;
     }
 
     public float getBestDist() {
